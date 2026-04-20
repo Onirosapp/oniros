@@ -299,26 +299,6 @@ export default function Oniros() {
           </div>
         </footer>
       </div>
-
-      <style jsx>{`
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 4s linear infinite;
-        }
-        @keyframes dots {
-          0%, 20% { content: ''; }
-          40% { content: '.'; }
-          60% { content: '..'; }
-          80%, 100% { content: '...'; }
-        }
-        .animate-dots::after {
-          content: '';
-          animation: dots 1.5s steps(4, end) infinite;
-        }
-      `}</style>
     </div>
   );
 }
