@@ -129,7 +129,7 @@ export async function POST(request) {
      if (!response.ok) {
       const errorText = await response.text();
       console.error('Anthropic API error:', errorText);
-      return Response.json({ error: `DEBUG: ${errorText}` }, { status: 500 });
+      return Response.json({ error: 'Errore nella generazione. Riprova.' }, { status: 500 });
     }
 
     const data = await response.json();
