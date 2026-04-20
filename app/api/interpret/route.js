@@ -95,7 +95,7 @@ Niente disclaimer. Massimo 350 parole.`,
 };
 
 const rateLimitMap = new Map();
-const DAILY_LIMIT = 5;
+const DAILY_LIMIT = 50;
 const WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function checkRateLimit(ip) {
