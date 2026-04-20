@@ -256,13 +256,13 @@ export default function Oniros() {
               </div>
             </div>
 
-            {loading && (
+           {loading && (
               <div className="py-12 text-center">
-                <div className="inline-block text-amber-200/60 text-4xl animate-pulse" style={{ animationDuration: '2s' }}>
+                <div className="inline-block text-amber-200/60 text-4xl animate-spin-slow">
                   ☾
                 </div>
                 <div className="mt-4 italic text-stone-400" style={{ fontFamily: 'Georgia, serif' }}>
-                  Lettura in corso...
+                  Lettura in corso<span className="animate-dots"></span>
                 </div>
               </div>
             )}
@@ -299,6 +299,26 @@ export default function Oniros() {
           </div>
         </footer>
       </div>
+
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 4s linear infinite;
+        }
+        @keyframes dots {
+          0%, 20% { content: ''; }
+          40% { content: '.'; }
+          60% { content: '..'; }
+          80%, 100% { content: '...'; }
+        }
+        .animate-dots::after {
+          content: '';
+          animation: dots 1.5s steps(4, end) infinite;
+        }
+      `}</style>
     </div>
   );
 }
