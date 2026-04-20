@@ -94,8 +94,32 @@ Un consiglio pratico e concreto nello stile della saggezza popolare, breve.
 Niente disclaimer. Massimo 350 parole.`,
 };
 
+const rateLimitMap = new Map();
+const DAILY_LIMIT = 5;
+const WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now - entry.firstRequest > WINDOW_MS) {
+    rateLimitMap.set(ip, { count: 1, firstRequest: now });
+    return { allowed: true };
+  }
+  if (entry.count >= DAILY_LIMIT) return { allowed: false };
+  entry.count++;
+  return { allowed: true };
+}
+
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { allowed } = checkRateLimit(ip);
+    if (!allowed) {
+      return Response.json(
+        { error: 'Hai raggiunto il limite giornaliero di interpretazioni. Riprova domani.' },
+        { status: 429 }
+      );
+    }
     const { dream, lens } = await request.json();
 
     if (!dream || dream.trim().length < 30) {
