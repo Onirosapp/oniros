@@ -57,6 +57,8 @@ export default function Oniros() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stage, setStage] = useState('input');
+  const [feedback, setFeedback] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   const interpret = async () => {
     if (dream.trim().length < 30) {
@@ -93,6 +95,8 @@ export default function Oniros() {
     setStage('input');
     setInterpretation('');
     setDream('');
+    setFeedback('');
+    setFeedbackSent(false);
   };
 
   const currentLens = LENSES.find(l => l.id === selectedLens);
@@ -293,10 +297,58 @@ export default function Oniros() {
           </div>
         )}
 
-        <footer className="mt-20 pt-8 border-t border-stone-800/60 text-center">
-          <div className="text-stone-500 text-xs tracking-[0.3em] uppercase italic">
+        {stage === 'result' && !loading && interpretation && (
+          <div className="max-w-3xl mx-auto mt-12 pt-8 border-t border-stone-800/60">
+            <p className="text-stone-400 text-sm italic mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+              Cosa ti ha lasciato questa interpretazione?
+            </p>
+            {!feedbackSent ? (
+              <div className="flex flex-wrap gap-3">
+                {[
+                  'Mi ha fatto riflettere',
+                  'Troppo generico',
+                  'Non capisco il valore delle altre lenti',
+                ].map(option => (
+                  <button
+                    key={option}
+                    onClick={async () => {
+                      setFeedback(option);
+                      await fetch('https://formspree.io/f/mojyrloy', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ feedback: option, lente: selectedLens }),
+                      });
+                      setFeedbackSent(true);
+                    }}
+                    className={`px-4 py-2 text-sm border transition-all italic ${
+                      feedback === option
+                        ? 'border-amber-200/60 text-amber-100'
+                        : 'border-stone-700/40 text-stone-400 hover:border-stone-500/60'
+                    }`}
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-stone-500 text-sm italic" style={{ fontFamily: 'Georgia, serif' }}>
+                Grazie — ci aiuta a migliorare.
+              </p>
+            )}
+          </div>
+        )}
+
+        <footer className="mt-12 pt-8 border-t border-stone-800/60 text-center">
+          <div className="text-stone-500 text-xs tracking-[0.3em] uppercase italic mb-2">
             Oniros · svago e curiosità — non consulenza clinica
           </div>
+          
+            href="mailto:onirosapp@gmail.com"
+            className="text-stone-600 text-xs hover:text-stone-400 transition-colors"
+          >
+            onirosapp@gmail.com
+          </a>
         </footer>
       </div>
     </div>
