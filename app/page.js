@@ -67,6 +67,12 @@ export default function Oniros() {
   const [paid, setPaid] = useState(false);
   const [hasUsedFreeLens, setHasUsedFreeLens] = useState(false);
 
+  useEffect(() => {
+    if (localStorage.getItem('oniros_paid') === 'true') {
+      setPaid(true);
+    }
+  }, []);
+
   const currentLens = LENSES.find(l => l.id === selectedLens);
   const isLensLocked = !currentLens.free && !paid;
 
@@ -129,6 +135,7 @@ export default function Oniros() {
     setPaid(false);
     setHasUsedFreeLens(false);
     setSelectedLens('jung');
+    localStorage.removeItem('oniros_paid');
   };
 
   const renderInterpretation = (text) => {

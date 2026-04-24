@@ -1,4 +1,12 @@
+'use client';
+
+import { useEffect } from 'react';
+
 export default function Grazie() {
+  useEffect(() => {
+    localStorage.setItem('oniros_paid', 'true');
+  }, []);
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center" style={{
       background: 'radial-gradient(ellipse at 20% 10%, #1a2847 0%, #0a1020 45%, #05080f 100%)',
