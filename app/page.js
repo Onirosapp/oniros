@@ -70,6 +70,11 @@ export default function Oniros() {
   useEffect(() => {
     if (localStorage.getItem('oniros_paid') === 'true') {
       setPaid(true);
+      const savedDream = localStorage.getItem('oniros_dream');
+      if (savedDream) {
+        setDream(savedDream);
+        localStorage.removeItem('oniros_dream');
+      }
     }
   }, []);
 
@@ -78,6 +83,7 @@ export default function Oniros() {
 
   const handleCheckout = async () => {
     try {
+      localStorage.setItem('oniros_dream', dream);
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
