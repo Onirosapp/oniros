@@ -344,11 +344,8 @@ export default function Oniros() {
             Oniros · svago e curiosità — non consulenza clinica
           </div>
           
-            href="mailto:onirosapp@gmail.com"
-            className="text-stone-600 text-xs hover:text-stone-400 transition-colors"
-          >
-            onirosapp@gmail.com
-          </a>
+            <a href="mailto:onirosapp@gmail.com" className="text-stone-600 text-xs hover:text-stone-400 transition-colors">onirosapp@gmail.com</a>
+            
         </footer>
       </div>
     </div>
