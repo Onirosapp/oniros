@@ -1,17 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const LENSES = [
-  {
-    id: 'freud',
-    name: 'Freud',
-    year: '1899',
-    tagline: 'Il sogno come desiderio rimosso',
-    short: 'Il desiderio nascosto',
-    whenToChoose: 'Scegli questa se vuoi capire cosa il tuo sogno sta cercando di nascondere. Freud pensava che i sogni camuffassero desideri che non vogliamo ammettere nemmeno a noi stessi.',
-    glyph: 'Ψ',
-  },
   {
     id: 'jung',
     name: 'Jung',
@@ -20,6 +11,17 @@ const LENSES = [
     short: 'Il messaggio simbolico',
     whenToChoose: 'Scegli questa se senti che il sogno voleva dirti qualcosa. Jung vedeva i sogni come messaggi che arrivano da una parte più antica e saggia di noi, per mostrarci cosa stiamo ignorando.',
     glyph: '☉',
+    free: true,
+  },
+  {
+    id: 'freud',
+    name: 'Freud',
+    year: '1899',
+    tagline: 'Il sogno come desiderio rimosso',
+    short: 'Il desiderio nascosto',
+    whenToChoose: 'Scegli questa se vuoi capire cosa il tuo sogno sta cercando di nascondere. Freud pensava che i sogni camuffassero desideri che non vogliamo ammettere nemmeno a noi stessi.',
+    glyph: 'Ψ',
+    free: false,
   },
   {
     id: 'gestalt',
@@ -27,8 +29,9 @@ const LENSES = [
     year: '1969',
     tagline: 'Tutti i personaggi sei tu',
     short: 'Ogni elemento sei tu',
-    whenToChoose: 'Scegli questa per una lettura diretta e concreta. Nella Gestalt tutto ciò che appare nel sogno — persone, animali, luoghi — è una parte di te che stai ignorando o respingendo.',
+    whenToChoose: 'Scegli questa per una lettura diretta e concreta. Nella Gestalt tutto ciò che appare nel sogno è una parte di te che stai ignorando o respingendo.',
     glyph: '◐',
+    free: false,
   },
   {
     id: 'cognitivo',
@@ -38,6 +41,7 @@ const LENSES = [
     short: 'La lettura scientifica',
     whenToChoose: 'Scegli questa se vuoi una spiegazione basata sulle neuroscienze, senza misticismi. Il sogno come elaborazione di memoria ed emozioni, non come messaggio in codice.',
     glyph: '◈',
+    free: false,
   },
   {
     id: 'simbolico',
@@ -47,6 +51,7 @@ const LENSES = [
     short: 'Simboli della tradizione',
     whenToChoose: 'Scegli questa per la lettura più ludica e antica. Serpenti, acqua, denti che cadono: cosa dicevano i libri di interpretazione dei sogni prima della psicologia.',
     glyph: '✦',
+    free: false,
   },
 ];
 
@@ -59,16 +64,40 @@ export default function Oniros() {
   const [stage, setStage] = useState('input');
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [hasUsedFreeLens, setHasUsedFreeLens] = useState(false);
+
+  const currentLens = LENSES.find(l => l.id === selectedLens);
+  const isLensLocked = !currentLens.free && !paid;
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json();
+      if (data.url) window.location.href = data.url;
+    } catch (e) {
+      setError('Errore nel pagamento. Riprova.');
+    }
+  };
 
   const interpret = async () => {
     if (dream.trim().length < 30) {
       setError('Racconta il sogno con più dettaglio — almeno qualche frase.');
       return;
     }
+    if (isLensLocked) {
+      setError('Sblocca tutte le lenti per leggere questa interpretazione.');
+      return;
+    }
     setError('');
     setLoading(true);
     setStage('result');
     setInterpretation('');
+    if (currentLens.free) setHasUsedFreeLens(true);
 
     try {
       const response = await fetch('/api/interpret', {
@@ -97,9 +126,10 @@ export default function Oniros() {
     setDream('');
     setFeedback('');
     setFeedbackSent(false);
+    setPaid(false);
+    setHasUsedFreeLens(false);
+    setSelectedLens('jung');
   };
-
-  const currentLens = LENSES.find(l => l.id === selectedLens);
 
   const renderInterpretation = (text) => {
     if (!text) return null;
@@ -153,40 +183,38 @@ export default function Oniros() {
               <p className="text-stone-200/80 text-[17px] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
                 Lo stesso sogno può dirti cose molto diverse a seconda di chi lo legge.
                 Raccontalo qui sotto, poi scegli <em>con quale lente</em> vuoi leggerlo.
-                Ogni lente è una scuola diversa di pensiero sui sogni — e ogni lente ti mostrerà il tuo sogno sotto una luce nuova.
+                La prima lettura è gratuita.
               </p>
             </div>
 
             <div className="grid md:grid-cols-5 gap-8 md:gap-12">
               <div className="md:col-span-3">
-                <div className="block">
-                  <span className="block italic text-amber-200/80 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-                    Racconta il tuo sogno
-                  </span>
-                  <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                    Tutto quello che ricordi: scene, persone, luoghi, oggetti, emozioni. Più dettagli, più la lettura sarà precisa.
-                  </span>
-                  <textarea
-                    value={dream}
-                    onChange={(e) => setDream(e.target.value)}
-                    placeholder="Ero in una casa che conoscevo ma non era la mia..."
-                    rows={14}
-                    className="w-full bg-stone-950/40 border border-amber-200/20 rounded-sm p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
-                    style={{ fontFamily: 'Georgia, serif' }}
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-stone-500 text-xs">{dream.length} caratteri</span>
-                    {error && <span className="text-red-300/80 text-sm italic">{error}</span>}
-                  </div>
+                <span className="block italic text-amber-200/80 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+                  Racconta il tuo sogno
+                </span>
+                <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
+                  Tutto quello che ricordi: scene, persone, luoghi, oggetti, emozioni.
+                </span>
+                <textarea
+                  value={dream}
+                  onChange={(e) => setDream(e.target.value)}
+                  placeholder="Ero in una casa che conoscevo ma non era la mia..."
+                  rows={14}
+                  className="w-full bg-stone-950/40 border border-amber-200/20 rounded-sm p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
+                  style={{ fontFamily: 'Georgia, serif' }}
+                />
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-stone-500 text-xs">{dream.length} caratteri</span>
+                  {error && <span className="text-red-300/80 text-sm italic">{error}</span>}
                 </div>
 
                 <button
                   onClick={interpret}
-                  disabled={loading}
+                  disabled={loading || isLensLocked}
                   className="mt-6 bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-8 py-4 text-lg tracking-wide transition-all disabled:opacity-50 italic"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
-                  Interpreta il sogno →
+                  Interpreta il sogno
                 </button>
               </div>
 
@@ -195,12 +223,12 @@ export default function Oniros() {
                   Scegli la lente
                 </span>
                 <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                  Tocca una lente per vedere cosa ti offrirà. Puoi cambiarla quando vuoi.
+                  La prima lettura è gratuita. Sblocca tutte le lenti per 2,99€.
                 </span>
-
                 <div className="space-y-2">
                   {LENSES.map(lens => {
                     const active = selectedLens === lens.id;
+                    const locked = !lens.free && !paid;
                     return (
                       <button
                         key={lens.id}
@@ -224,10 +252,22 @@ export default function Oniros() {
                               <span className={`text-xs italic ${active ? 'text-amber-200/70' : 'text-stone-500'}`}>
                                 — {lens.short}
                               </span>
+                              {locked && (
+                                <span className="text-xs text-stone-600 ml-auto">🔒</span>
+                              )}
                             </div>
                             {active && (
                               <div className="mt-3 text-stone-200/85 text-sm leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
                                 {lens.whenToChoose}
+                                {locked && (
+                                  <button
+                                    onClick={handleCheckout}
+                                    className="mt-3 block w-full bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-4 py-2 text-sm italic transition-all text-center"
+                                    style={{ fontFamily: 'Georgia, serif' }}
+                                  >
+                                    Sblocca tutte le lenti — 2,99€
+                                  </button>
+                                )}
                               </div>
                             )}
                           </div>
@@ -260,7 +300,7 @@ export default function Oniros() {
               </div>
             </div>
 
-           {loading && (
+            {loading && (
               <div className="py-12 text-center">
                 <div className="inline-block text-amber-200/60 text-4xl animate-spin-slow">
                   ☾
@@ -275,22 +315,44 @@ export default function Oniros() {
               <div>
                 {renderInterpretation(interpretation)}
 
+                {hasUsedFreeLens && !paid && (
+                  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5">
+                    <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                      Hai letto una lente. Ne restano quattro.
+                    </p>
+                    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                      Freud, Gestalt, Scienza e Tradizione leggono lo stesso sogno in modi completamente diversi. Sblocca tutte le lenti per 2,99€.
+                    </p>
+                    <button
+                      onClick={handleCheckout}
+                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all"
+                      style={{ fontFamily: 'Georgia, serif' }}
+                    >
+                      Sblocca tutte le lenti — 2,99€
+                    </button>
+                  </div>
+                )}
+
                 <div className="mt-12 pt-8 border-t border-amber-200/20 flex flex-wrap gap-4">
                   <button
                     onClick={reset}
                     className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
-                    ← Un altro sogno
+                    Un altro sogno
                   </button>
-                  <span className="text-stone-600">·</span>
-                  <button
-                    onClick={() => { setStage('input'); setInterpretation(''); }}
-                    className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
-                    style={{ fontFamily: 'Georgia, serif' }}
-                  >
-                    Leggi lo stesso sogno con un&apos;altra lente
-                  </button>
+                  {paid && (
+                    <>
+                      <span className="text-stone-600">·</span>
+                      <button
+                        onClick={() => { setStage('input'); setInterpretation(''); }}
+                        className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
+                        style={{ fontFamily: 'Georgia, serif' }}
+                      >
+                        Leggi con un&apos;altra lente
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -343,9 +405,7 @@ export default function Oniros() {
           <div className="text-stone-500 text-xs tracking-[0.3em] uppercase italic mb-2">
             Oniros · svago e curiosità — non consulenza clinica
           </div>
-          
-            <a href="mailto:onirosapp@gmail.com" className="text-stone-600 text-xs hover:text-stone-400 transition-colors">onirosapp@gmail.com</a>
-
+          <a href="mailto:onirosapp@gmail.com" className="text-stone-600 text-xs hover:text-stone-400 transition-colors">onirosapp@gmail.com</a>
         </footer>
       </div>
     </div>
