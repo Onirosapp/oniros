@@ -306,8 +306,8 @@ export default function Oniros() {
               <div className="flex flex-wrap gap-3">
                 {[
                   'Mi ha fatto riflettere',
-                  'Troppo generico',
-                  'Non capisco il valore delle altre lenti',
+                  'Troppo generico, poteva valere per chiunque',
+                  'Non mi convince, non pagherei per le altre lenti',
                 ].map(option => (
                   <button
                     key={option}
@@ -345,7 +345,7 @@ export default function Oniros() {
           </div>
           
             <a href="mailto:onirosapp@gmail.com" className="text-stone-600 text-xs hover:text-stone-400 transition-colors">onirosapp@gmail.com</a>
-            
+
         </footer>
       </div>
     </div>
