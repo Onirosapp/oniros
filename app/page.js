@@ -228,7 +228,7 @@ export default function Oniros() {
               <button
                 onClick={interpret}
                 disabled={loading}
-                className="w-full group rounded-md py-4 px-8 text-lg italic tracking-wide transition-all disabled:opacity-50"
+                className="w-full group rounded-md py-4 px-8 text-lg italic tracking-wide transition-all disabled:opacity-50 active:opacity-80 active:scale-[0.98]"
                 style={{
                   fontFamily: 'Georgia, serif',
                   background: 'linear-gradient(135deg, #d4b483 0%, #c9a96e 50%, #b8935a 100%)',
@@ -278,29 +278,25 @@ export default function Oniros() {
 
             {/* Loading status */}
             {loading && (
-              <div className="mb-10 p-5 border border-stone-700/40 rounded-md">
-                <p className="text-stone-400 text-sm italic mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                  {paid ? 'Le cinque voci stanno leggendo il tuo sogno…' : 'Lettura in corso…'}
-                </p>
-                {paid && (
-                  <div className="space-y-3">
-                    {LENSES.map(lens => (
-                      <div key={lens.id} className="flex items-center gap-3">
-                        <span className={`text-base w-5 ${lensStatus[lens.id] === 'done' ? 'text-amber-200' : lensStatus[lens.id] === 'loading' ? 'text-amber-200/50' : 'text-stone-700'}`}>
-                          {lens.glyph}
-                        </span>
-                        <span className={`text-sm ${lensStatus[lens.id] === 'done' ? 'text-stone-300' : lensStatus[lens.id] === 'loading' ? 'text-stone-400' : 'text-stone-600'}`} style={{ fontFamily: 'Georgia, serif' }}>
-                          {lens.name}
-                        </span>
-                        <span className="text-xs italic text-stone-600" style={{ fontFamily: 'Georgia, serif' }}>
-                          {lensStatus[lens.id] === 'done' ? '— completata' : lensStatus[lens.id] === 'loading' ? '— in lettura…' : '— in attesa'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+  <div className="py-12 text-center">
+    <div className="inline-block text-amber-200/60 text-4xl animate-pulse">☾</div>
+    <div className="mt-4 italic text-stone-400" style={{ fontFamily: 'Georgia, serif' }}>
+      {paid ? 'Le cinque voci stanno leggendo il tuo sogno…' : 'Lettura in corso…'}
+    </div>
+    {paid && (
+      <div className="mt-6 inline-flex flex-col gap-2 text-left">
+        {LENSES.map(lens => (
+          <div key={lens.id} className="flex items-center gap-3">
+            <span className={`text-base w-5 ${lensStatus[lens.id] === 'done' ? 'text-amber-200' : lensStatus[lens.id] === 'loading' ? 'text-amber-200/40' : 'text-stone-700'}`}>{lens.glyph}</span>
+            <span className={`text-sm italic ${lensStatus[lens.id] === 'done' ? 'text-stone-400' : 'text-stone-600'}`} style={{ fontFamily: 'Georgia, serif' }}>
+              {lens.name} {lensStatus[lens.id] === 'done' ? '— completata' : lensStatus[lens.id] === 'loading' ? '— in lettura…' : ''}
+            </span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
 
             {/* Interpretazioni */}
             {lensesToShow.map((lens, i) => {
@@ -338,7 +334,7 @@ export default function Oniros() {
                 </p>
                 <button
                   onClick={handleCheckout}
-                  className="w-full rounded-md py-4 px-6 italic transition-all"
+                  className="w-full rounded-md py-4 px-6 italic transition-all active:opacity-80 active:scale-[0.98]"
                   style={{
                     fontFamily: 'Georgia, serif',
                     background: 'linear-gradient(135deg, #d4b483 0%, #b8935a 100%)',
