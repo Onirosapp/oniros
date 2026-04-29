@@ -82,7 +82,7 @@ export default function Oniros() {
 }, []);
 
   const currentLens = LENSES.find(l => l.id === selectedLens);
-  const isLensLocked = !currentLens.free && !paid;
+  const isLensLocked = !paid && (!currentLens.free || hasUsedFreeLens);
 
   const handleCheckout = async () => {
     try {
