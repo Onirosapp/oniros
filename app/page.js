@@ -3,46 +3,11 @@
 import React, { useState, useEffect } from 'react';
 
 const LENSES = [
-  {
-    id: 'jung',
-    name: 'Jung',
-    year: '1934',
-    tagline: 'Il messaggio del tuo profondo',
-    glyph: '☉',
-    free: true,
-  },
-  {
-    id: 'freud',
-    name: 'Freud',
-    year: '1899',
-    tagline: 'Il sogno come desiderio rimosso',
-    glyph: 'Ψ',
-    free: false,
-  },
-  {
-    id: 'gestalt',
-    name: 'Gestalt',
-    year: '1969',
-    tagline: 'Tutti i personaggi sei tu',
-    glyph: '◐',
-    free: false,
-  },
-  {
-    id: 'cognitivo',
-    name: 'Scienza',
-    year: '2010',
-    tagline: 'Cosa fa il tuo cervello mentre sogni',
-    glyph: '◈',
-    free: false,
-  },
-  {
-    id: 'simbolico',
-    name: 'Tradizione',
-    year: '',
-    tagline: 'Il significato antico dei simboli',
-    glyph: '✦',
-    free: false,
-  },
+  { id: 'jung', name: 'Jung', year: '1934', tagline: 'Il messaggio del tuo profondo', glyph: '☉', free: true },
+  { id: 'freud', name: 'Freud', year: '1899', tagline: 'Il sogno come desiderio rimosso', glyph: 'Ψ', free: false },
+  { id: 'gestalt', name: 'Gestalt', year: '1969', tagline: 'Tutti i personaggi sei tu', glyph: '◐', free: false },
+  { id: 'cognitivo', name: 'Scienza', year: '2010', tagline: 'Cosa fa il tuo cervello mentre sogni', glyph: '◈', free: false },
+  { id: 'simbolico', name: 'Tradizione', year: '', tagline: 'Il significato antico dei simboli', glyph: '✦', free: false },
 ];
 
 export default function Oniros() {
@@ -177,8 +142,8 @@ export default function Oniros() {
         backgroundSize: '200px 200px',
       }} />
 
-      <div className="relative max-w-5xl mx-auto px-6 py-12 md:py-16">
-        <header className="mb-10 md:mb-12">
+      <div className="relative max-w-6xl mx-auto px-6 py-12 md:py-16">
+        <header className="mb-10 md:mb-14">
           <div className="flex items-baseline gap-4 mb-2">
             <span className="text-amber-200/70 text-2xl" style={{ fontFamily: 'Georgia, serif' }}>☾</span>
             <h1 className="text-amber-100 text-4xl md:text-5xl tracking-tight" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}>
@@ -191,37 +156,47 @@ export default function Oniros() {
         </header>
 
         {stage === 'input' && (
-          <>
-            <div className="mb-10 md:mb-12 max-w-3xl">
+          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
+
+            {/* Colonna sinistra: preambolo + steps */}
+            <div>
               <p className="text-stone-200/80 text-[17px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                 Lo stesso sogno, letto da cinque scuole di pensiero diverse, può dirti cose completamente opposte. Freud vede desideri nascosti. Jung vede messaggi dall'inconscio. La Gestalt vede parti di te che non riconosci. Le neuroscienze vedono il cervello al lavoro. La tradizione vede presagi.
               </p>
-              <p className="text-amber-200/70 text-[17px] leading-relaxed italic" style={{ fontFamily: 'Georgia, serif' }}>
+              <p className="text-amber-200/70 text-[17px] leading-relaxed italic mb-12" style={{ fontFamily: 'Georgia, serif' }}>
                 Nessuno di loro ha torto. Ognuno illumina un angolo diverso dello stesso sogno.
               </p>
-            </div>
 
-            <div className="max-w-3xl">
-              <div className="flex items-start gap-0 mb-10 relative">
+              <div className="space-y-6">
                 {[
-                  { glyph: '✦', num: '01', text: 'Racconti il sogno come lo ricordi' },
-                  { glyph: '☉', num: '02', text: "Leggi un'anteprima gratuita — la voce di Jung" },
-                  { glyph: '☾', num: '03', text: "Sblocchi l'interpretazione completa — tutte e cinque le voci — per 2,99€" },
+                  { glyph: '✦', num: '01', title: 'Racconti il sogno', sub: 'come lo ricordi, con tutti i dettagli', highlight: false },
+                  { glyph: '☉', num: '02', title: 'Leggi Jung gratis', sub: 'un\'anteprima gratuita — la prima voce', highlight: true },
+                  { glyph: '☾', num: '03', title: 'Sblocchi tutto per 2,99€', sub: 'tutte e cinque le voci sul tuo sogno', highlight: true },
                 ].map((step, i, arr) => (
-                  <div key={i} className="flex-1 flex flex-col items-center text-center relative">
-                    {i < arr.length - 1 && (
-                      <div className="absolute top-5 left-1/2 right-[-50%] h-px bg-gradient-to-r from-amber-200/40 to-stone-700/30" />
-                    )}
-                    <div className="w-10 h-10 rounded-full border border-amber-200/40 flex items-center justify-center bg-stone-950 z-10 mb-3">
-                      <span className="text-amber-200/70 text-base">{step.glyph}</span>
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="flex flex-col items-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full border border-amber-200/40 flex items-center justify-center bg-stone-950">
+                        <span className="text-amber-200/70 text-base">{step.glyph}</span>
+                      </div>
+                      {i < arr.length - 1 && (
+                        <div className="w-px h-6 bg-gradient-to-b from-amber-200/20 to-transparent mt-1" />
+                      )}
                     </div>
-                    <div className="text-[10px] tracking-[0.2em] uppercase text-stone-600 mb-1">{step.num}</div>
-                    <div className="text-[12px] italic text-stone-400 leading-snug px-2" style={{ fontFamily: 'Georgia, serif' }}>{step.text}</div>
+                    <div className="pt-1.5">
+                      <div className="text-[10px] tracking-[0.2em] uppercase text-stone-600 mb-0.5">{step.num}</div>
+                      <div className={`text-sm italic ${step.highlight ? 'text-amber-200' : 'text-stone-300'}`} style={{ fontFamily: 'Georgia, serif' }}>
+                        {step.title}
+                      </div>
+                      <div className="text-stone-500 text-xs mt-0.5" style={{ fontFamily: 'Georgia, serif' }}>{step.sub}</div>
+                    </div>
                   </div>
                 ))}
               </div>
+            </div>
 
-              <span className="block italic text-amber-200/80 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+            {/* Colonna destra: form */}
+            <div>
+              <span className="block italic text-amber-200/80 text-lg mb-2" style={{ fontFamily: 'Georgia, serif' }}>
                 Racconta il tuo sogno
               </span>
               <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
@@ -231,11 +206,11 @@ export default function Oniros() {
                 value={dream}
                 onChange={(e) => setDream(e.target.value)}
                 placeholder="Ero in una casa che conoscevo ma non era la mia..."
-                rows={14}
-                className="w-full bg-stone-950/40 border border-amber-200/20 rounded-sm p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
+                rows={12}
+                className="w-full bg-stone-950/40 border border-amber-200/20 rounded-md p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
                 style={{ fontFamily: 'Georgia, serif' }}
               />
-              <div className="flex justify-between items-center mt-2">
+              <div className="flex justify-between items-center mt-2 mb-5">
                 <span className="text-stone-500 text-xs">{dream.length} caratteri</span>
                 {error && <span className="text-red-300/80 text-sm italic">{error}</span>}
               </div>
@@ -243,14 +218,22 @@ export default function Oniros() {
               <button
                 onClick={interpret}
                 disabled={loading}
-                className="mt-6 bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-8 py-4 text-lg tracking-wide transition-all disabled:opacity-50 italic"
-                style={{ fontFamily: 'Georgia, serif' }}
+                className="w-full group rounded-md py-4 px-8 text-lg italic tracking-wide transition-all disabled:opacity-50"
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  background: 'linear-gradient(135deg, #d4b483 0%, #c9a96e 50%, #b8935a 100%)',
+                  color: '#0a1020',
+                  boxShadow: '0 0 30px rgba(212,180,131,0.15), 0 2px 8px rgba(0,0,0,0.4)',
+                }}
               >
-                Interpreta il sogno →
+                <span className="flex items-center justify-center gap-3">
+                  <span>Interpreta il sogno</span>
+                  <span className="text-xl transition-transform group-hover:translate-x-1">→</span>
+                </span>
               </button>
 
               {showPaywallBanner && (
-                <div className="mt-4 p-5 border border-amber-200/30 bg-amber-200/5 rounded-md">
+                <div className="mt-5 p-5 border border-amber-200/30 bg-amber-200/5 rounded-md">
                   <p className="text-amber-100 italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
                     Hai già usato l'anteprima gratuita.
                   </p>
@@ -259,15 +242,19 @@ export default function Oniros() {
                   </p>
                   <button
                     onClick={handleCheckout}
-                    className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all text-sm rounded-md"
-                    style={{ fontFamily: 'Georgia, serif' }}
+                    className="w-full rounded-md py-3 px-6 italic transition-all text-sm"
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      background: 'linear-gradient(135deg, #d4b483 0%, #b8935a 100%)',
+                      color: '#0a1020',
+                    }}
                   >
                     Sblocca l'interpretazione completa — 2,99€
                   </button>
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
 
         {stage === 'result' && (
@@ -311,20 +298,26 @@ export default function Oniros() {
                     <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
                       Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
                     </p>
-                    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                    <p className="text-stone-400 text-sm mb-5" style={{ fontFamily: 'Georgia, serif' }}>
                       La lettura completa include tutte e cinque le voci. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
                     </p>
                     <button
                       onClick={handleCheckout}
-                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all rounded-md"
-                      style={{ fontFamily: 'Georgia, serif' }}
+                      className="w-full rounded-md py-4 px-6 italic transition-all"
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        background: 'linear-gradient(135deg, #d4b483 0%, #b8935a 100%)',
+                        color: '#0a1020',
+                        fontSize: '1rem',
+                        boxShadow: '0 0 24px rgba(212,180,131,0.12)',
+                      }}
                     >
                       Leggi l'interpretazione completa — 2,99€
                     </button>
                   </div>
                 )}
 
-                <div className="mt-12 pt-8 border-t border-amber-200/20 flex flex-wrap gap-4">
+                <div className="mt-12 pt-8 border-t border-amber-200/20">
                   <button
                     onClick={reset}
                     className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
@@ -379,7 +372,7 @@ export default function Oniros() {
           </div>
         )}
 
-        <footer className="mt-12 pt-8 border-t border-stone-800/60 text-center">
+        <footer className="mt-16 pt-8 border-t border-stone-800/60 text-center">
           <div className="text-stone-500 text-xs tracking-[0.3em] uppercase italic mb-2">
             Oniros · solo per svago — non sostituisce consulenza psicologica o medica
           </div>
