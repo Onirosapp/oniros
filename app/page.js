@@ -69,21 +69,21 @@ export default function Oniros() {
   const [hasUsedFreeLens, setHasUsedFreeLens] = useState(false);
 
   useEffect(() => {
-  if (localStorage.getItem('oniros_paid') === 'true') {
-    setPaid(true);
-    const savedDream = localStorage.getItem('oniros_dream');
-    if (savedDream) {
-      setDream(savedDream);
-      localStorage.removeItem('oniros_dream');
+    if (localStorage.getItem('oniros_paid') === 'true') {
+      setPaid(true);
+      const savedDream = localStorage.getItem('oniros_dream');
+      if (savedDream) {
+        setDream(savedDream);
+        localStorage.removeItem('oniros_dream');
+      }
     }
-  }
-  if (localStorage.getItem('oniros_used_free') === 'true') {
-    setHasUsedFreeLens(true);
-  }
-}, []);
+    if (localStorage.getItem('oniros_used_free') === 'true') {
+      setHasUsedFreeLens(true);
+    }
+  }, []);
 
   const currentLens = LENSES.find(l => l.id === selectedLens);
-  const isLensLocked = !paid && (!currentLens.free || hasUsedFreeLens);
+  const isLensLocked = !paid && !currentLens.free;
 
   const handleCheckout = async () => {
     try {
@@ -106,17 +106,17 @@ export default function Oniros() {
       return;
     }
     if (isLensLocked) {
-  setShowPaywallBanner(true);
-  return;
-}
+      setShowPaywallBanner(true);
+      return;
+    }
     setError('');
     setLoading(true);
     setStage('result');
     setInterpretation('');
     if (currentLens.free) {
-  setHasUsedFreeLens(true);
-  localStorage.setItem('oniros_used_free', 'true');
-}
+      setHasUsedFreeLens(true);
+      localStorage.setItem('oniros_used_free', 'true');
+    }
 
     try {
       const response = await fetch('/api/interpret', {
@@ -170,11 +170,11 @@ export default function Oniros() {
     });
   };
 
-const truncateWords = (text, limit) => {
-  const words = text.split(/\s+/);
-  if (words.length <= limit) return text;
-  return words.slice(0, limit).join(' ') + '…';
-};
+  const truncateWords = (text, limit) => {
+    const words = text.split(/\s+/);
+    if (words.length <= limit) return text;
+    return words.slice(0, limit).join(' ') + '…';
+  };
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden" style={{
@@ -242,22 +242,22 @@ const truncateWords = (text, limit) => {
                   Interpreta il sogno
                 </button>
                 {showPaywallBanner && (
-  <div className="mt-4 p-5 border border-amber-200/30 bg-amber-200/5">
-    <p className="text-amber-100 italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-      Hai già usato la lettura gratuita.
-    </p>
-    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-      Sblocca Freud, Gestalt, Scienza e Tradizione per 2,99€.
-    </p>
-    <button
-      onClick={handleCheckout}
-      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all text-sm"
-      style={{ fontFamily: 'Georgia, serif' }}
-    >
-      Sblocca tutte le lenti — 2,99€
-    </button>
-  </div>
-)}
+                  <div className="mt-4 p-5 border border-amber-200/30 bg-amber-200/5">
+                    <p className="text-amber-100 italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                      Hai già usato la lettura gratuita.
+                    </p>
+                    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                      Sblocca Freud, Gestalt, Scienza e Tradizione per 2,99€.
+                    </p>
+                    <button
+                      onClick={handleCheckout}
+                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all text-sm"
+                      style={{ fontFamily: 'Georgia, serif' }}
+                    >
+                      Sblocca tutte le lenti — 2,99€
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="md:col-span-2">
@@ -275,11 +275,10 @@ const truncateWords = (text, limit) => {
                       <button
                         key={lens.id}
                         onClick={() => setSelectedLens(lens.id)}
-                        className={`w-full text-left p-4 border transition-all ${
-                          active
+                        className={`w-full text-left p-4 border transition-all ${active
                             ? 'border-amber-200/60 bg-amber-200/5'
                             : 'border-stone-700/40 hover:border-stone-500/60 bg-transparent'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start gap-3">
                           <span className={`text-2xl leading-none mt-0.5 ${active ? 'text-amber-200' : 'text-stone-500'}`}>
@@ -356,28 +355,28 @@ const truncateWords = (text, limit) => {
             {!loading && interpretation && (
               <div>
                 {renderInterpretation(
-  (!paid && currentLens.free)
-    ? truncateWords(interpretation, 200)
-    : interpretation
-)}
+                  (!paid && currentLens.free)
+                    ? truncateWords(interpretation, 200)
+                    : interpretation
+                )}
 
-               {hasUsedFreeLens && !paid && (
-  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5">
-    <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-      Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
-    </p>
-    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-      La lettura completa include tutte e 5 le prospettive. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
-    </p>
-    <button
-      onClick={handleCheckout}
-      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all"
-      style={{ fontFamily: 'Georgia, serif' }}
-    >
-      Leggi l'interpretazione completa — 2,99€
-    </button>
-  </div>
-)}
+                {hasUsedFreeLens && !paid && (
+                  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5">
+                    <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                      Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
+                    </p>
+                    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                      La lettura completa include tutte e 5 le prospettive. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
+                    </p>
+                    <button
+                      onClick={handleCheckout}
+                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all"
+                      style={{ fontFamily: 'Georgia, serif' }}
+                    >
+                      Leggi l'interpretazione completa — 2,99€
+                    </button>
+                  </div>
+                )}
 
                 <div className="mt-12 pt-8 border-t border-amber-200/20 flex flex-wrap gap-4">
                   <button
@@ -428,11 +427,10 @@ const truncateWords = (text, limit) => {
                       });
                       setFeedbackSent(true);
                     }}
-                    className={`px-4 py-2 text-sm border transition-all italic ${
-                      feedback === option
+                    className={`px-4 py-2 text-sm border transition-all italic ${feedback === option
                         ? 'border-amber-200/60 text-amber-100'
                         : 'border-stone-700/40 text-stone-400 hover:border-stone-500/60'
-                    }`}
+                      }`}
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
                     {option}
