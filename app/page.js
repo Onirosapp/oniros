@@ -3,17 +3,18 @@
 import React, { useState, useEffect } from 'react';
 
 const LENSES = [
-  { id: 'jung', name: 'Jung', year: '1934', tagline: 'Il messaggio del tuo profondo', glyph: '☉', free: true },
-  { id: 'freud', name: 'Freud', year: '1899', tagline: 'Il sogno come desiderio rimosso', glyph: 'Ψ', free: false },
-  { id: 'gestalt', name: 'Gestalt', year: '1969', tagline: 'Tutti i personaggi sei tu', glyph: '◐', free: false },
-  { id: 'cognitivo', name: 'Scienza', year: '2010', tagline: 'Cosa fa il tuo cervello mentre sogni', glyph: '◈', free: false },
-  { id: 'simbolico', name: 'Tradizione', year: '', tagline: 'Il significato antico dei simboli', glyph: '✦', free: false },
+  { id: 'jung', name: 'Jung', year: '1934', tagline: 'Il messaggio del tuo profondo', glyph: '☉', question: 'Cosa ti sta dicendo la tua mente profonda?', free: true },
+  { id: 'freud', name: 'Freud', year: '1899', tagline: 'Il sogno come desiderio rimosso', glyph: 'Ψ', question: 'Cosa stai desiderando senza ammetterlo?', free: false },
+  { id: 'gestalt', name: 'Gestalt', year: '1969', tagline: 'Tutti i personaggi sei tu', glyph: '◐', question: 'Quale parte di te stai ignorando?', free: false },
+  { id: 'cognitivo', name: 'Scienza', year: '2010', tagline: 'Cosa fa il tuo cervello mentre sogni', glyph: '◈', question: 'Cosa sta elaborando il tuo cervello?', free: false },
+  { id: 'simbolico', name: 'Tradizione', year: '', tagline: 'Il significato antico dei simboli', glyph: '✦', question: 'Cosa dicono i simboli antichi?', free: false },
 ];
 
 export default function Oniros() {
   const [dream, setDream] = useState('');
-  const [selectedLens] = useState('jung');
   const [interpretation, setInterpretation] = useState('');
+  const [allInterpretations, setAllInterpretations] = useState({});
+  const [lensStatus, setLensStatus] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stage, setStage] = useState('input');
@@ -37,8 +38,6 @@ export default function Oniros() {
     }
   }, []);
 
-  const currentLens = LENSES.find(l => l.id === selectedLens);
-
   const handleCheckout = async () => {
     try {
       localStorage.setItem('oniros_dream', dream);
@@ -54,6 +53,26 @@ export default function Oniros() {
     }
   };
 
+  const fetchLens = async (lensId, dreamText) => {
+    setLensStatus(prev => ({ ...prev, [lensId]: 'loading' }));
+    try {
+      const response = await fetch('/api/interpret', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dream: dreamText, lens: lensId }),
+      });
+      const data = await response.json();
+      if (data.interpretation) {
+        setAllInterpretations(prev => ({ ...prev, [lensId]: data.interpretation }));
+        setLensStatus(prev => ({ ...prev, [lensId]: 'done' }));
+      } else {
+        setLensStatus(prev => ({ ...prev, [lensId]: 'error' }));
+      }
+    } catch (e) {
+      setLensStatus(prev => ({ ...prev, [lensId]: 'error' }));
+    }
+  };
+
   const interpret = async () => {
     if (dream.trim().length < 30) {
       setError('Racconta il sogno con più dettaglio — almeno qualche frase.');
@@ -65,42 +84,40 @@ export default function Oniros() {
     }
     setError('');
     setLoading(true);
+    setAllInterpretations({});
+    setLensStatus({});
     setStage('result');
-    setInterpretation('');
+
     if (!paid) {
       setHasUsedFreeLens(true);
       localStorage.setItem('oniros_used_free', 'true');
+      // Solo Jung in anteprima
+      await fetchLens('jung', dream);
+      setInterpretation('done');
+    } else {
+      // Tutte e 5 in parallelo
+      await Promise.all(LENSES.map(l => fetchLens(l.id, dream)));
+      setInterpretation('done');
     }
-
-    try {
-      const response = await fetch('/api/interpret', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dream, lens: selectedLens }),
-      });
-      const data = await response.json();
-      if (data.error) {
-        setError(data.error);
-        setStage('input');
-      } else {
-        setInterpretation(data.interpretation);
-      }
-    } catch (e) {
-      setError('Qualcosa è andato storto. Riprova.');
-      setStage('input');
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   };
 
   const reset = () => {
     setStage('input');
     setInterpretation('');
+    setAllInterpretations({});
+    setLensStatus({});
     setDream('');
     setFeedback('');
     setFeedbackSent(false);
     setPaid(false);
     localStorage.removeItem('oniros_paid');
+  };
+
+  const truncateWords = (text, limit) => {
+    const words = text.split(/\s+/);
+    if (words.length <= limit) return text;
+    return words.slice(0, limit).join(' ') + '…';
   };
 
   const renderInterpretation = (text) => {
@@ -111,11 +128,11 @@ export default function Oniros() {
       const heading = lines[0];
       const body = lines.slice(1).join('\n').trim();
       return (
-        <div key={i} className="mb-8">
-          <h3 className="text-[13px] uppercase tracking-[0.2em] text-amber-200/90 mb-3 border-b border-amber-200/20 pb-2" style={{ fontFamily: 'Georgia, serif' }}>
+        <div key={i} className="mb-6">
+          <h3 className="text-[12px] uppercase tracking-[0.2em] text-amber-200/70 mb-3 border-b border-amber-200/10 pb-2" style={{ fontFamily: 'Georgia, serif' }}>
             {heading}
           </h3>
-          <p className="text-[17px] leading-[1.75] text-stone-100/90 whitespace-pre-wrap" style={{ fontFamily: 'Georgia, serif' }}>
+          <p className="text-[16px] leading-[1.8] text-stone-100/85 whitespace-pre-wrap" style={{ fontFamily: 'Georgia, serif' }}>
             {body}
           </p>
         </div>
@@ -123,11 +140,7 @@ export default function Oniros() {
     });
   };
 
-  const truncateWords = (text, limit) => {
-    const words = text.split(/\s+/);
-    if (words.length <= limit) return text;
-    return words.slice(0, limit).join(' ') + '…';
-  };
+  const lensesToShow = paid ? LENSES : LENSES.filter(l => l.free);
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden" style={{
@@ -157,8 +170,6 @@ export default function Oniros() {
 
         {stage === 'input' && (
           <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
-
-            {/* Colonna sinistra: preambolo + steps */}
             <div>
               <p className="text-stone-200/80 text-[17px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                 Lo stesso sogno, letto da cinque scuole di pensiero diverse, può dirti cose completamente opposte. Freud vede desideri nascosti. Jung vede messaggi dall'inconscio. La Gestalt vede parti di te che non riconosci. Le neuroscienze vedono il cervello al lavoro. La tradizione vede presagi.
@@ -170,7 +181,7 @@ export default function Oniros() {
               <div className="space-y-6">
                 {[
                   { glyph: '✦', num: '01', title: 'Racconti il sogno', sub: 'come lo ricordi, con tutti i dettagli', highlight: false },
-                  { glyph: '☉', num: '02', title: 'Leggi Jung gratis', sub: 'un\'anteprima gratuita — la prima voce', highlight: true },
+                  { glyph: '☉', num: '02', title: 'Leggi Jung gratis', sub: "un'anteprima gratuita — la prima voce", highlight: true },
                   { glyph: '☾', num: '03', title: 'Sblocchi tutto per 2,99€', sub: 'tutte e cinque le voci sul tuo sogno', highlight: true },
                 ].map((step, i, arr) => (
                   <div key={i} className="flex items-start gap-4">
@@ -194,7 +205,6 @@ export default function Oniros() {
               </div>
             </div>
 
-            {/* Colonna destra: form */}
             <div>
               <span className="block italic text-amber-200/80 text-lg mb-2" style={{ fontFamily: 'Georgia, serif' }}>
                 Racconta il tuo sogno
@@ -259,16 +269,6 @@ export default function Oniros() {
 
         {stage === 'result' && (
           <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-3 mb-8 pb-6 border-b border-amber-200/20">
-              <span className="text-3xl text-amber-200">{currentLens.glyph}</span>
-              <div>
-                <div className="text-amber-100 text-xl italic" style={{ fontFamily: 'Georgia, serif' }}>
-                  Lettura secondo {currentLens.name}
-                </div>
-                <div className="text-stone-400 text-sm italic">{currentLens.tagline}</div>
-              </div>
-            </div>
-
             <div className="mb-10 pl-4 border-l-2 border-stone-700/60">
               <div className="text-stone-500 text-xs uppercase tracking-widest mb-2">Il sogno</div>
               <div className="text-stone-300/70 italic text-[15px] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
@@ -276,56 +276,91 @@ export default function Oniros() {
               </div>
             </div>
 
+            {/* Loading status */}
             {loading && (
-              <div className="py-12 text-center">
-                <div className="inline-block text-amber-200/60 text-4xl animate-spin-slow">☾</div>
-                <div className="mt-4 italic text-stone-400" style={{ fontFamily: 'Georgia, serif' }}>
-                  Lettura in corso<span className="animate-dots"></span>
+              <div className="mb-10 p-5 border border-stone-700/40 rounded-md">
+                <p className="text-stone-400 text-sm italic mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                  {paid ? 'Le cinque voci stanno leggendo il tuo sogno…' : 'Lettura in corso…'}
+                </p>
+                {paid && (
+                  <div className="space-y-3">
+                    {LENSES.map(lens => (
+                      <div key={lens.id} className="flex items-center gap-3">
+                        <span className={`text-base w-5 ${lensStatus[lens.id] === 'done' ? 'text-amber-200' : lensStatus[lens.id] === 'loading' ? 'text-amber-200/50' : 'text-stone-700'}`}>
+                          {lens.glyph}
+                        </span>
+                        <span className={`text-sm ${lensStatus[lens.id] === 'done' ? 'text-stone-300' : lensStatus[lens.id] === 'loading' ? 'text-stone-400' : 'text-stone-600'}`} style={{ fontFamily: 'Georgia, serif' }}>
+                          {lens.name}
+                        </span>
+                        <span className="text-xs italic text-stone-600" style={{ fontFamily: 'Georgia, serif' }}>
+                          {lensStatus[lens.id] === 'done' ? '— completata' : lensStatus[lens.id] === 'loading' ? '— in lettura…' : '— in attesa'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Interpretazioni */}
+            {lensesToShow.map((lens, i) => {
+              const text = allInterpretations[lens.id];
+              const status = lensStatus[lens.id];
+              if (!text && status !== 'done') return null;
+
+              const displayText = (!paid && lens.free)
+                ? truncateWords(text || '', 200)
+                : text || '';
+
+              return (
+                <div key={lens.id} className={`mb-12 pb-12 ${i < lensesToShow.length - 1 ? 'border-b border-stone-800/60' : ''}`}>
+                  <div className="flex items-baseline gap-3 mb-6">
+                    <span className="text-amber-200 text-2xl">{lens.glyph}</span>
+                    <div>
+                      <span className="text-amber-100 text-xl italic" style={{ fontFamily: 'Georgia, serif' }}>{lens.name}</span>
+                      {lens.year && <span className="text-stone-600 text-xs ml-2">{lens.year}</span>}
+                      <div className="text-stone-500 text-xs italic mt-0.5" style={{ fontFamily: 'Georgia, serif' }}>— {lens.question}</div>
+                    </div>
+                  </div>
+                  {renderInterpretation(displayText)}
                 </div>
+              );
+            })}
+
+            {/* Paywall dopo Jung */}
+            {!paid && hasUsedFreeLens && allInterpretations['jung'] && (
+              <div className="mt-2 p-6 border border-amber-200/20 bg-amber-200/5 rounded-md">
+                <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                  Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
+                </p>
+                <p className="text-stone-400 text-sm mb-5" style={{ fontFamily: 'Georgia, serif' }}>
+                  La lettura completa include tutte e cinque le voci. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
+                </p>
+                <button
+                  onClick={handleCheckout}
+                  className="w-full rounded-md py-4 px-6 italic transition-all"
+                  style={{
+                    fontFamily: 'Georgia, serif',
+                    background: 'linear-gradient(135deg, #d4b483 0%, #b8935a 100%)',
+                    color: '#0a1020',
+                    fontSize: '1rem',
+                    boxShadow: '0 0 24px rgba(212,180,131,0.12)',
+                  }}
+                >
+                  Leggi l'interpretazione completa — 2,99€
+                </button>
               </div>
             )}
 
             {!loading && interpretation && (
-              <div>
-                {renderInterpretation(
-                  (!paid && currentLens.free)
-                    ? truncateWords(interpretation, 200)
-                    : interpretation
-                )}
-
-                {hasUsedFreeLens && !paid && (
-                  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5 rounded-md">
-                    <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-                      Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
-                    </p>
-                    <p className="text-stone-400 text-sm mb-5" style={{ fontFamily: 'Georgia, serif' }}>
-                      La lettura completa include tutte e cinque le voci. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
-                    </p>
-                    <button
-                      onClick={handleCheckout}
-                      className="w-full rounded-md py-4 px-6 italic transition-all"
-                      style={{
-                        fontFamily: 'Georgia, serif',
-                        background: 'linear-gradient(135deg, #d4b483 0%, #b8935a 100%)',
-                        color: '#0a1020',
-                        fontSize: '1rem',
-                        boxShadow: '0 0 24px rgba(212,180,131,0.12)',
-                      }}
-                    >
-                      Leggi l'interpretazione completa — 2,99€
-                    </button>
-                  </div>
-                )}
-
-                <div className="mt-12 pt-8 border-t border-amber-200/20">
-                  <button
-                    onClick={reset}
-                    className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
-                    style={{ fontFamily: 'Georgia, serif' }}
-                  >
-                    ← Un altro sogno
-                  </button>
-                </div>
+              <div className="mt-12 pt-8 border-t border-amber-200/20">
+                <button
+                  onClick={reset}
+                  className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
+                  style={{ fontFamily: 'Georgia, serif' }}
+                >
+                  ← Un altro sogno
+                </button>
               </div>
             )}
           </div>
@@ -350,7 +385,7 @@ export default function Oniros() {
                       await fetch('https://formspree.io/f/mojyrloy', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ feedback: option, lente: selectedLens }),
+                        body: JSON.stringify({ feedback: option }),
                       });
                       setFeedbackSent(true);
                     }}
