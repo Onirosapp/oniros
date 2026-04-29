@@ -170,6 +170,12 @@ export default function Oniros() {
     });
   };
 
+const truncateWords = (text, limit) => {
+  const words = text.split(/\s+/);
+  if (words.length <= limit) return text;
+  return words.slice(0, limit).join(' ') + '…';
+};
+
   return (
     <div className="min-h-screen w-full relative overflow-hidden" style={{
       background: 'radial-gradient(ellipse at 20% 10%, #1a2847 0%, #0a1020 45%, #05080f 100%)',
@@ -349,25 +355,29 @@ export default function Oniros() {
 
             {!loading && interpretation && (
               <div>
-                {renderInterpretation(interpretation)}
+                {renderInterpretation(
+  (!paid && currentLens.free)
+    ? truncateWords(interpretation, 200)
+    : interpretation
+)}
 
-                {hasUsedFreeLens && !paid && (
-                  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5">
-                    <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-                      Hai letto una lente. Ne restano quattro.
-                    </p>
-                    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                      Freud, Gestalt, Scienza e Tradizione leggono lo stesso sogno in modi completamente diversi. Sblocca tutte le lenti per 2,99€.
-                    </p>
-                    <button
-                      onClick={handleCheckout}
-                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all"
-                      style={{ fontFamily: 'Georgia, serif' }}
-                    >
-                      Sblocca tutte le lenti — 2,99€
-                    </button>
-                  </div>
-                )}
+               {hasUsedFreeLens && !paid && (
+  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5">
+    <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+      Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
+    </p>
+    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+      La lettura completa include tutte e 5 le prospettive. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
+    </p>
+    <button
+      onClick={handleCheckout}
+      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all"
+      style={{ fontFamily: 'Georgia, serif' }}
+    >
+      Leggi l'interpretazione completa — 2,99€
+    </button>
+  </div>
+)}
 
                 <div className="mt-12 pt-8 border-t border-amber-200/20 flex flex-wrap gap-4">
                   <button
