@@ -105,9 +105,9 @@ export default function Oniros() {
       return;
     }
     if (isLensLocked) {
-      setError('Sblocca tutte le lenti per leggere questa interpretazione.');
-      return;
-    }
+  handleCheckout();
+  return;
+}
     setError('');
     setLoading(true);
     setStage('result');
@@ -145,7 +145,6 @@ export default function Oniros() {
     setFeedback('');
     setFeedbackSent(false);
     setPaid(false);
-    setHasUsedFreeLens(false);
     setSelectedLens('jung');
     localStorage.removeItem('oniros_paid');
   };
@@ -229,7 +228,7 @@ export default function Oniros() {
 
                 <button
                   onClick={interpret}
-                  disabled={loading || isLensLocked}
+                  disabled={loading}
                   className="mt-6 bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-8 py-4 text-lg tracking-wide transition-all disabled:opacity-50 italic"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
