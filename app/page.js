@@ -126,7 +126,10 @@ export default function Oniros() {
     return parts.map((part, i) => {
       const lines = part.split('\n');
       const heading = lines[0];
-      const body = lines.slice(1).join('\n').trim();
+      const body = lines.slice(1).join('\n').trim()
+  .replace(/\*\*(.+?)\*\*/g, '$1')
+  .replace(/\*(.+?)\*/g, '$1')
+  .replace(/^---$/gm, '');
       return (
         <div key={i} className="mb-6">
           <h3 className="text-[12px] uppercase tracking-[0.2em] text-amber-200/70 mb-3 border-b border-amber-200/10 pb-2" style={{ fontFamily: 'Georgia, serif' }}>
