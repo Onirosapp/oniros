@@ -68,15 +68,18 @@ export default function Oniros() {
   const [hasUsedFreeLens, setHasUsedFreeLens] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem('oniros_paid') === 'true') {
-      setPaid(true);
-      const savedDream = localStorage.getItem('oniros_dream');
-      if (savedDream) {
-        setDream(savedDream);
-        localStorage.removeItem('oniros_dream');
-      }
+  if (localStorage.getItem('oniros_paid') === 'true') {
+    setPaid(true);
+    const savedDream = localStorage.getItem('oniros_dream');
+    if (savedDream) {
+      setDream(savedDream);
+      localStorage.removeItem('oniros_dream');
     }
-  }, []);
+  }
+  if (localStorage.getItem('oniros_used_free') === 'true') {
+    setHasUsedFreeLens(true);
+  }
+}, []);
 
   const currentLens = LENSES.find(l => l.id === selectedLens);
   const isLensLocked = !currentLens.free && !paid;
@@ -109,7 +112,10 @@ export default function Oniros() {
     setLoading(true);
     setStage('result');
     setInterpretation('');
-    if (currentLens.free) setHasUsedFreeLens(true);
+    if (currentLens.free) {
+  setHasUsedFreeLens(true);
+  localStorage.setItem('oniros_used_free', 'true');
+}
 
     try {
       const response = await fetch('/api/interpret', {
