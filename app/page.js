@@ -8,8 +8,6 @@ const LENSES = [
     name: 'Jung',
     year: '1934',
     tagline: 'Il messaggio del tuo profondo',
-    short: 'Il messaggio simbolico',
-    whenToChoose: 'Scegli questa se senti che il sogno voleva dirti qualcosa. Jung vedeva i sogni come messaggi che arrivano da una parte più antica e saggia di noi, per mostrarci cosa stiamo ignorando.',
     glyph: '☉',
     free: true,
   },
@@ -18,8 +16,6 @@ const LENSES = [
     name: 'Freud',
     year: '1899',
     tagline: 'Il sogno come desiderio rimosso',
-    short: 'Il desiderio nascosto',
-    whenToChoose: 'Scegli questa se vuoi capire cosa il tuo sogno sta cercando di nascondere. Freud pensava che i sogni camuffassero desideri che non vogliamo ammettere nemmeno a noi stessi.',
     glyph: 'Ψ',
     free: false,
   },
@@ -28,8 +24,6 @@ const LENSES = [
     name: 'Gestalt',
     year: '1969',
     tagline: 'Tutti i personaggi sei tu',
-    short: 'Ogni elemento sei tu',
-    whenToChoose: 'Scegli questa per una lettura diretta e concreta. Nella Gestalt tutto ciò che appare nel sogno è una parte di te che stai ignorando o respingendo.',
     glyph: '◐',
     free: false,
   },
@@ -38,8 +32,6 @@ const LENSES = [
     name: 'Scienza',
     year: '2010',
     tagline: 'Cosa fa il tuo cervello mentre sogni',
-    short: 'La lettura scientifica',
-    whenToChoose: 'Scegli questa se vuoi una spiegazione basata sulle neuroscienze, senza misticismi. Il sogno come elaborazione di memoria ed emozioni, non come messaggio in codice.',
     glyph: '◈',
     free: false,
   },
@@ -48,8 +40,6 @@ const LENSES = [
     name: 'Tradizione',
     year: '',
     tagline: 'Il significato antico dei simboli',
-    short: 'Simboli della tradizione',
-    whenToChoose: 'Scegli questa per la lettura più ludica e antica. Serpenti, acqua, denti che cadono: cosa dicevano i libri di interpretazione dei sogni prima della psicologia.',
     glyph: '✦',
     free: false,
   },
@@ -57,7 +47,7 @@ const LENSES = [
 
 export default function Oniros() {
   const [dream, setDream] = useState('');
-  const [selectedLens, setSelectedLens] = useState('jung');
+  const [selectedLens] = useState('jung');
   const [interpretation, setInterpretation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -83,7 +73,6 @@ export default function Oniros() {
   }, []);
 
   const currentLens = LENSES.find(l => l.id === selectedLens);
-  const isLensLocked = !paid && !currentLens.free;
 
   const handleCheckout = async () => {
     try {
@@ -105,7 +94,7 @@ export default function Oniros() {
       setError('Racconta il sogno con più dettaglio — almeno qualche frase.');
       return;
     }
-    if (isLensLocked) {
+    if (hasUsedFreeLens && !paid) {
       setShowPaywallBanner(true);
       return;
     }
@@ -113,7 +102,7 @@ export default function Oniros() {
     setLoading(true);
     setStage('result');
     setInterpretation('');
-    if (currentLens.free) {
+    if (!paid) {
       setHasUsedFreeLens(true);
       localStorage.setItem('oniros_used_free', 'true');
     }
@@ -146,7 +135,6 @@ export default function Oniros() {
     setFeedback('');
     setFeedbackSent(false);
     setPaid(false);
-    setSelectedLens('jung');
     localStorage.removeItem('oniros_paid');
   };
 
@@ -205,119 +193,79 @@ export default function Oniros() {
         {stage === 'input' && (
           <>
             <div className="mb-10 md:mb-12 max-w-3xl">
-              <p className="text-stone-200/80 text-[17px] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
-                Lo stesso sogno può dirti cose molto diverse a seconda di chi lo legge.
-                Raccontalo qui sotto, poi scegli <em>con quale lente</em> vuoi leggerlo.
-                La prima lettura è gratuita.
+              <p className="text-stone-200/80 text-[17px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                Lo stesso sogno, letto da cinque scuole di pensiero diverse, può dirti cose completamente opposte. Freud vede desideri nascosti. Jung vede messaggi dall'inconscio. La Gestalt vede parti di te che non riconosci. Le neuroscienze vedono il cervello al lavoro. La tradizione vede presagi.
+              </p>
+              <p className="text-amber-200/70 text-[17px] leading-relaxed italic" style={{ fontFamily: 'Georgia, serif' }}>
+                Nessuno di loro ha torto. Ognuno illumina un angolo diverso dello stesso sogno.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-5 gap-8 md:gap-12">
-              <div className="md:col-span-3">
-                <span className="block italic text-amber-200/80 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-                  Racconta il tuo sogno
-                </span>
-                <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                  Tutto quello che ricordi: scene, persone, luoghi, oggetti, emozioni.
-                </span>
-                <textarea
-                  value={dream}
-                  onChange={(e) => setDream(e.target.value)}
-                  placeholder="Ero in una casa che conoscevo ma non era la mia..."
-                  rows={14}
-                  className="w-full bg-stone-950/40 border border-amber-200/20 rounded-sm p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
-                  style={{ fontFamily: 'Georgia, serif' }}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-stone-500 text-xs">{dream.length} caratteri</span>
-                  {error && <span className="text-red-300/80 text-sm italic">{error}</span>}
-                </div>
-
-                <button
-                  onClick={interpret}
-                  disabled={loading}
-                  className="mt-6 bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-8 py-4 text-lg tracking-wide transition-all disabled:opacity-50 italic"
-                  style={{ fontFamily: 'Georgia, serif' }}
-                >
-                  Interpreta il sogno
-                </button>
-                {showPaywallBanner && (
-                  <div className="mt-4 p-5 border border-amber-200/30 bg-amber-200/5">
-                    <p className="text-amber-100 italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-                      Hai già usato la lettura gratuita.
-                    </p>
-                    <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                      Sblocca Freud, Gestalt, Scienza e Tradizione per 2,99€.
-                    </p>
-                    <button
-                      onClick={handleCheckout}
-                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all text-sm"
-                      style={{ fontFamily: 'Georgia, serif' }}
-                    >
-                      Sblocca tutte le lenti — 2,99€
-                    </button>
+            <div className="max-w-3xl">
+              <div className="flex items-start gap-0 mb-10 relative">
+                {[
+                  { glyph: '✦', num: '01', text: 'Racconti il sogno come lo ricordi' },
+                  { glyph: '☉', num: '02', text: "Leggi un'anteprima gratuita — la voce di Jung" },
+                  { glyph: '☾', num: '03', text: "Sblocchi l'interpretazione completa — tutte e cinque le voci — per 2,99€" },
+                ].map((step, i, arr) => (
+                  <div key={i} className="flex-1 flex flex-col items-center text-center relative">
+                    {i < arr.length - 1 && (
+                      <div className="absolute top-5 left-1/2 right-[-50%] h-px bg-gradient-to-r from-amber-200/40 to-stone-700/30" />
+                    )}
+                    <div className="w-10 h-10 rounded-full border border-amber-200/40 flex items-center justify-center bg-stone-950 z-10 mb-3">
+                      <span className="text-amber-200/70 text-base">{step.glyph}</span>
+                    </div>
+                    <div className="text-[10px] tracking-[0.2em] uppercase text-stone-600 mb-1">{step.num}</div>
+                    <div className="text-[12px] italic text-stone-400 leading-snug px-2" style={{ fontFamily: 'Georgia, serif' }}>{step.text}</div>
                   </div>
-                )}
+                ))}
               </div>
 
-              <div className="md:col-span-2">
-                <span className="block italic text-amber-200/80 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
-                  Scegli la lente
-                </span>
-                <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                  La prima lettura è gratuita. Sblocca tutte le lenti per 2,99€.
-                </span>
-                <div className="space-y-2">
-                  {LENSES.map(lens => {
-                    const active = selectedLens === lens.id;
-                    const locked = !lens.free && !paid;
-                    return (
-                      <button
-                        key={lens.id}
-                        onClick={() => setSelectedLens(lens.id)}
-                        className={`w-full text-left p-4 border transition-all ${active
-                            ? 'border-amber-200/60 bg-amber-200/5'
-                            : 'border-stone-700/40 hover:border-stone-500/60 bg-transparent'
-                          }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <span className={`text-2xl leading-none mt-0.5 ${active ? 'text-amber-200' : 'text-stone-500'}`}>
-                            {lens.glyph}
-                          </span>
-                          <div className="flex-1">
-                            <div className="flex items-baseline gap-2 flex-wrap">
-                              <span className={`text-lg ${active ? 'text-amber-100' : 'text-stone-200'}`} style={{ fontFamily: 'Georgia, serif' }}>
-                                {lens.name}
-                              </span>
-                              <span className="text-stone-500 text-xs">{lens.year}</span>
-                              <span className={`text-xs italic ${active ? 'text-amber-200/70' : 'text-stone-500'}`}>
-                                — {lens.short}
-                              </span>
-                              {locked && (
-                                <span className="text-xs text-stone-600 ml-auto">🔒</span>
-                              )}
-                            </div>
-                            {active && (
-                              <div className="mt-3 text-stone-200/85 text-sm leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
-                                {lens.whenToChoose}
-                                {locked && (
-                                  <button
-                                    onClick={handleCheckout}
-                                    className="mt-3 block w-full bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-4 py-2 text-sm italic transition-all text-center"
-                                    style={{ fontFamily: 'Georgia, serif' }}
-                                  >
-                                    Sblocca tutte le lenti — 2,99€
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+              <span className="block italic text-amber-200/80 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+                Racconta il tuo sogno
+              </span>
+              <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
+                Tutto quello che ricordi: scene, persone, luoghi, oggetti, emozioni. Più dettagli, più la lettura sarà precisa.
+              </span>
+              <textarea
+                value={dream}
+                onChange={(e) => setDream(e.target.value)}
+                placeholder="Ero in una casa che conoscevo ma non era la mia..."
+                rows={14}
+                className="w-full bg-stone-950/40 border border-amber-200/20 rounded-sm p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
+                style={{ fontFamily: 'Georgia, serif' }}
+              />
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-stone-500 text-xs">{dream.length} caratteri</span>
+                {error && <span className="text-red-300/80 text-sm italic">{error}</span>}
               </div>
+
+              <button
+                onClick={interpret}
+                disabled={loading}
+                className="mt-6 bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-8 py-4 text-lg tracking-wide transition-all disabled:opacity-50 italic"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                Interpreta il sogno →
+              </button>
+
+              {showPaywallBanner && (
+                <div className="mt-4 p-5 border border-amber-200/30 bg-amber-200/5 rounded-md">
+                  <p className="text-amber-100 italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                    Hai già usato l'anteprima gratuita.
+                  </p>
+                  <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                    Sblocca l'interpretazione completa — tutte e cinque le voci — per 2,99€.
+                  </p>
+                  <button
+                    onClick={handleCheckout}
+                    className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all text-sm rounded-md"
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
+                    Sblocca l'interpretazione completa — 2,99€
+                  </button>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -343,9 +291,7 @@ export default function Oniros() {
 
             {loading && (
               <div className="py-12 text-center">
-                <div className="inline-block text-amber-200/60 text-4xl animate-spin-slow">
-                  ☾
-                </div>
+                <div className="inline-block text-amber-200/60 text-4xl animate-spin-slow">☾</div>
                 <div className="mt-4 italic text-stone-400" style={{ fontFamily: 'Georgia, serif' }}>
                   Lettura in corso<span className="animate-dots"></span>
                 </div>
@@ -361,16 +307,16 @@ export default function Oniros() {
                 )}
 
                 {hasUsedFreeLens && !paid && (
-                  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5">
+                  <div className="mt-10 p-6 border border-amber-200/20 bg-amber-200/5 rounded-md">
                     <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
                       Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
                     </p>
                     <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                      La lettura completa include tutte e 5 le prospettive. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
+                      La lettura completa include tutte e cinque le voci. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
                     </p>
                     <button
                       onClick={handleCheckout}
-                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all"
+                      className="bg-amber-200/90 hover:bg-amber-100 text-stone-950 px-6 py-3 italic transition-all rounded-md"
                       style={{ fontFamily: 'Georgia, serif' }}
                     >
                       Leggi l'interpretazione completa — 2,99€
@@ -384,20 +330,8 @@ export default function Oniros() {
                     className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
-                    Un altro sogno
+                    ← Un altro sogno
                   </button>
-                  {paid && (
-                    <>
-                      <span className="text-stone-600">·</span>
-                      <button
-                        onClick={() => { setStage('input'); setInterpretation(''); }}
-                        className="italic text-amber-200/80 hover:text-amber-100 transition-colors"
-                        style={{ fontFamily: 'Georgia, serif' }}
-                      >
-                        Leggi con un&apos;altra lente
-                      </button>
-                    </>
-                  )}
                 </div>
               </div>
             )}
@@ -414,7 +348,7 @@ export default function Oniros() {
                 {[
                   'Mi ha fatto riflettere',
                   'Troppo generico, poteva valere per chiunque',
-                  'Non mi convince, non pagherei per le altre lenti',
+                  'Non pagherei per le altre voci',
                 ].map(option => (
                   <button
                     key={option}
@@ -427,9 +361,9 @@ export default function Oniros() {
                       });
                       setFeedbackSent(true);
                     }}
-                    className={`px-4 py-2 text-sm border transition-all italic ${feedback === option
-                        ? 'border-amber-200/60 text-amber-100'
-                        : 'border-stone-700/40 text-stone-400 hover:border-stone-500/60'
+                    className={`px-4 py-2 text-sm border rounded-md transition-all italic ${feedback === option
+                      ? 'border-amber-200/60 text-amber-100'
+                      : 'border-stone-700/40 text-stone-400 hover:border-stone-500/60'
                       }`}
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
