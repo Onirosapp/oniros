@@ -173,7 +173,7 @@ export default function Oniros() {
 
         {stage === 'input' && (
           <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
-            <div>
+            <div className="order-2 md:order-1">
               <p className="text-stone-200/80 text-[17px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                 Lo stesso sogno, letto da cinque scuole di pensiero diverse, può dirti cose completamente opposte. Freud vede desideri nascosti. Jung vede messaggi dall'inconscio. La Gestalt vede parti di te che non riconosci. Le neuroscienze vedono il cervello al lavoro. La tradizione vede presagi.
               </p>
@@ -208,7 +208,7 @@ export default function Oniros() {
               </div>
             </div>
 
-            <div>
+            <div className="order-1 md:order-2">
               <span className="block italic text-amber-200/80 text-lg mb-2" style={{ fontFamily: 'Georgia, serif' }}>
                 Racconta il tuo sogno
               </span>
