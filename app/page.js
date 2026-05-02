@@ -185,7 +185,7 @@ export default function Oniros() {
                 {[
                   { glyph: '✦', num: '01', title: 'Racconti il sogno', sub: 'come lo ricordi, con tutti i dettagli', highlight: false },
                   { glyph: '☉', num: '02', title: 'Leggi Jung gratis', sub: "un'anteprima gratuita — la prima voce", highlight: true },
-                  { glyph: '☾', num: '03', title: 'Sblocchi tutto per 2,99€', sub: 'tutte e cinque le voci sul tuo sogno', highlight: true },
+                  { glyph: '☾', num: '03', title: 'Sblocchi tutto per 9,99€', sub: 'tutte e cinque le voci sul tuo sogno', highlight: true },
                 ].map((step, i, arr) => (
                   <div key={i} className="flex items-start gap-4">
                     <div className="flex flex-col items-center flex-shrink-0">
@@ -251,7 +251,7 @@ export default function Oniros() {
                     Hai già usato l'anteprima gratuita.
                   </p>
                   <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                    Sblocca l'interpretazione completa — tutte e cinque le voci — per 2,99€.
+                    Sblocca l'interpretazione completa — tutte e cinque le voci — per 9,99€.
                   </p>
                   <button
                     onClick={handleCheckout}
@@ -262,7 +262,7 @@ export default function Oniros() {
                       color: '#0a1020',
                     }}
                   >
-                    Sblocca l'interpretazione completa — 2,99€
+                    Sblocca l'interpretazione completa — 9,99€
                   </button>
                 </div>
               )}
@@ -346,7 +346,7 @@ export default function Oniros() {
                     boxShadow: '0 0 24px rgba(212,180,131,0.12)',
                   }}
                 >
-                  Leggi l'interpretazione completa — 2,99€
+                  Leggi l'interpretazione completa — 9,99€
                 </button>
               </div>
             )}

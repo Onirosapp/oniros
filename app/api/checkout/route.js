@@ -16,7 +16,7 @@ export async function POST(request) {
               name: 'Oniros — Tutte le lenti',
               description: 'Il tuo sogno letto con tutte e 5 le lenti interpretative',
             },
-            unit_amount: 299,
+            unit_amount: 999,
           },
           quantity: 1,
         },
