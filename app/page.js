@@ -248,10 +248,10 @@ export default function Oniros() {
               {showPaywallBanner && (
                 <div className="mt-5 p-5 border border-amber-200/30 bg-amber-200/5 rounded-md">
                   <p className="text-amber-100 italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-                    Hai già usato l'anteprima gratuita.
+                    Hai già ricevuto la prima risposta.
                   </p>
                   <p className="text-stone-400 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                    Sblocca l'interpretazione completa — tutte e cinque le voci — per 9,99€.
+                    Ma una sola lettura non basta a un sogno. Scopri cosa ti sta dicendo davvero — 9,99€.
                   </p>
                   <button
                     onClick={handleCheckout}
@@ -262,13 +262,10 @@ export default function Oniros() {
                       color: '#0a1020',
                     }}
                   >
-                    Sblocca l'interpretazione completa — 9,99€
+                    Scopri tutto — 9,99€
                   </button>
                 </div>
               )}
-            </div>
-          </div>
-        )}
 
         {stage === 'result' && (
           <div className="max-w-3xl mx-auto">
@@ -330,10 +327,10 @@ export default function Oniros() {
             {!paid && hasUsedFreeLens && allInterpretations['jung'] && (
               <div className="mt-2 p-6 border border-amber-200/20 bg-amber-200/5 rounded-md">
                 <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-                  Jung ha letto il tuo sogno. Ma Freud lo legge in modo completamente diverso.
+                  Questa è una sola voce. Il tuo sogno ne ha altre quattro.
                 </p>
                 <p className="text-stone-400 text-sm mb-5" style={{ fontFamily: 'Georgia, serif' }}>
-                  La lettura completa include tutte e cinque le voci. Non per averne di più — perché la verità del tuo sogno non sta in una sola.
+                  Quattro letture diverse — opposte, a volte contraddittorie. La verità del tuo sogno sta nel punto in cui si incontrano. Solo tu puoi riconoscerla.
                 </p>
                 <button
                   onClick={handleCheckout}
@@ -346,7 +343,7 @@ export default function Oniros() {
                     boxShadow: '0 0 24px rgba(212,180,131,0.12)',
                   }}
                 >
-                  Leggi l'interpretazione completa — 9,99€
+                  Scopri le altre quattro — 9,99€
                 </button>
               </div>
             )}
