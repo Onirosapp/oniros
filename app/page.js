@@ -175,17 +175,17 @@ export default function Oniros() {
           <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
             <div className="order-2 md:order-1">
               <p className="text-stone-200/80 text-[17px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                Lo stesso sogno, letto da cinque scuole di pensiero diverse, può dirti cose completamente opposte. Freud vede desideri nascosti. Jung vede messaggi dall'inconscio. La Gestalt vede parti di te che non riconosci. Le neuroscienze vedono il cervello al lavoro. La tradizione vede presagi.
+                Quel sogno strano di stanotte non è casuale. La parte di te che l'ha creato — quella che lavora mentre dormi — sta cercando di dirti qualcosa che da sveglio fai fatica a vedere.
               </p>
               <p className="text-amber-200/70 text-[17px] leading-relaxed italic mb-12" style={{ fontFamily: 'Georgia, serif' }}>
-                Nessuno di loro ha torto. Ognuno illumina un angolo diverso dello stesso sogno.
+                Cinque scuole di psicologia, cinque risposte diverse alla stessa domanda: cosa significa davvero quello che hai sognato.
               </p>
 
               <div className="space-y-6">
                 {[
-                  { glyph: '✦', num: '01', title: 'Racconti il sogno', sub: 'come lo ricordi, con tutti i dettagli', highlight: false },
-                  { glyph: '☉', num: '02', title: 'Leggi Jung gratis', sub: "un'anteprima gratuita — la prima voce", highlight: true },
-                  { glyph: '☾', num: '03', title: 'Sblocchi tutto per 9,99€', sub: 'tutte e cinque le voci sul tuo sogno', highlight: true },
+                  { glyph: '✦', num: '01', title: 'Scrivi il sogno mentre lo ricordi', sub: 'prima che svanisca — anche confuso, anche a pezzi', highlight: false },
+                  { glyph: '☉', num: '02', title: 'Ricevi una prima risposta, gratis', sub: 'la lettura più diretta — quella che da sola, però, non basta', highlight: true },
+                  { glyph: '☾', num: '03', title: 'Scopri cosa ti sta dicendo davvero — 9,99€', sub: 'quattro voci che vedono nel tuo sogno cose opposte. La verità sta nel punto in cui si incontrano.', highlight: true },
                 ].map((step, i, arr) => (
                   <div key={i} className="flex items-start gap-4">
                     <div className="flex flex-col items-center flex-shrink-0">
@@ -210,10 +210,10 @@ export default function Oniros() {
 
             <div className="order-1 md:order-2">
               <span className="block italic text-amber-200/80 text-lg mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-                Racconta il tuo sogno
+                Cosa hai sognato?
               </span>
               <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                Tutto quello che ricordi: scene, persone, luoghi, oggetti, emozioni. Più dettagli, più la lettura sarà precisa.
+                Raccontalo come lo ricordi — anche se è confuso. Più dettagli scrivi, più la lettura sarà precisa.
               </span>
               <textarea
                 value={dream}
