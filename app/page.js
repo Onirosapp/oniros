@@ -266,6 +266,9 @@ export default function Oniros() {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        )}
 
         {stage === 'result' && (
           <div className="max-w-3xl mx-auto">
