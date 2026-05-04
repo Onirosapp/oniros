@@ -221,7 +221,6 @@ export default function Oniros() {
                 Cosa hai sognato?
               </span>
 
-              </span>
               <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
                 Anche confuso, anche a pezzi. Bastano immagini, luoghi, persone, sensazioni.
               </span>
