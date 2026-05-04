@@ -158,8 +158,8 @@ export default function Oniros() {
         backgroundSize: '200px 200px',
       }} />
 
-      <div className="relative max-w-6xl mx-auto px-6 py-12 md:py-16">
-        <header className="mb-10 md:mb-14">
+      <div className="relative max-w-6xl mx-auto px-6 py-6 md:py-16">
+        <header className="mb-6 md:mb-14">
           <div className="flex items-baseline gap-4 mb-2">
             <span className="text-amber-200/70 text-2xl" style={{ fontFamily: 'Georgia, serif' }}>☾</span>
             <h1 className="text-amber-100 text-4xl md:text-5xl tracking-tight" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}>
@@ -240,7 +240,7 @@ export default function Oniros() {
               <button
                 onClick={interpret}
                 disabled={loading}
-                className="w-full group rounded-md py-4 px-8 text-lg italic tracking-wide transition-all disabled:opacity-50 active:opacity-80 active:scale-[0.98]"
+                className="w-full group rounded-md py-3 px-6 text-lg italic tracking-wide transition-all disabled:opacity-50 active:opacity-80 active:scale-[0.98]"
                 style={{
                   fontFamily: 'Georgia, serif',
                   background: 'linear-gradient(135deg, #d4b483 0%, #c9a96e 50%, #b8935a 100%)',
