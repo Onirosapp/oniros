@@ -1,7 +1,7 @@
 export default function sitemap() {
   return [
     {
-      url: 'https://onirosapp.com',
+      url: 'https://www.onirosapp.com',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
