@@ -209,17 +209,27 @@ export default function Oniros() {
             </div>
 
             <div className="order-1 md:order-2">
+              <div className="mb-8">
+                <p className="text-stone-200/90 text-[19px] leading-relaxed mb-2 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  Quel sogno non era casuale.
+                </p>
+                <p className="text-amber-200/90 text-base italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  ✦ La prima lettura è gratuita.
+                </p>
+              </div>
               <span className="block italic text-amber-200/80 text-lg mb-2" style={{ fontFamily: 'Georgia, serif' }}>
                 Cosa hai sognato?
               </span>
+
+              </span>
               <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                Raccontalo come lo ricordi — anche se è confuso. Più dettagli scrivi, più la lettura sarà precisa.
+                Anche confuso, anche a pezzi. Bastano immagini, luoghi, persone, sensazioni.
               </span>
               <textarea
                 value={dream}
                 onChange={(e) => setDream(e.target.value)}
                 placeholder="Ero in una casa che conoscevo ma non era la mia..."
-                rows={12}
+                rows={8}
                 className="w-full bg-stone-950/40 border border-amber-200/20 rounded-md p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
                 style={{ fontFamily: 'Georgia, serif' }}
               />
@@ -240,7 +250,7 @@ export default function Oniros() {
                 }}
               >
                 <span className="flex items-center justify-center gap-3">
-                  <span>Interpreta il sogno</span>
+                  <span>Scopri cosa significa - gratis</span>
                   <span className="text-xl transition-transform group-hover:translate-x-1">→</span>
                 </span>
               </button>
