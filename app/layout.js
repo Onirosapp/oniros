@@ -15,12 +15,16 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Oniros — Atelier dei sogni",
   description: "Il tuo sogno letto attraverso cinque scuole di pensiero: Freud, Jung, Gestalt, neuroscienze, tradizione. Primo sogno gratis.",
+  alternates: {
+    canonical: "https://www.onirosapp.com",
+  },
+  keywords: ["interpretazione sogni", "analisi sogni", "Jung", "Freud", "sogni"],
 };
 
 export default function RootLayout({ children }) {
   return (
     <html
-      lang="en"
+      lang="it"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}<Analytics /></body>
