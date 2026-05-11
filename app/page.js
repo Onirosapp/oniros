@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const LENSES = [
   { id: 'jung', name: 'Jung', year: '1934', tagline: 'Il messaggio del tuo profondo', glyph: '☉', question: 'Cosa ti sta dicendo la tua mente profonda?', free: true },
@@ -8,6 +8,24 @@ const LENSES = [
   { id: 'gestalt', name: 'Gestalt', year: '1969', tagline: 'Tutti i personaggi sei tu', glyph: '◐', question: 'Quale parte di te stai ignorando?', free: false },
   { id: 'cognitivo', name: 'Scienza', year: '2010', tagline: 'Cosa fa il tuo cervello mentre sogni', glyph: '◈', question: 'Cosa sta elaborando il tuo cervello?', free: false },
   { id: 'simbolico', name: 'Tradizione', year: '', tagline: 'Il significato antico dei simboli', glyph: '✦', question: 'Cosa dicono i simboli antichi?', free: false },
+];
+
+const COMMON_DREAMS = [
+  {
+    icon: '🦷',
+    title: 'Hai sognato di perdere i denti',
+    preview: "Non è il dentista. Quasi sempre arriva quando qualcosa che credevi di tenere stretto — un controllo, una sicurezza, una versione di te — sta cedendo. Tre scuole leggono questo sogno in modi opposti, e una delle tre risuona dentro come solo la verità sa fare.",
+  },
+  {
+    icon: '💔',
+    title: 'Hai sognato il tuo ex',
+    preview: "Non significa che lo vuoi indietro. Quasi mai. Significa che qualcosa che lui o lei rappresentava — sicurezza, attenzione, una versione di te — ti manca ancora. Oppure che una conversazione è rimasta sospesa, anche dentro di te.",
+  },
+  {
+    icon: '🌀',
+    title: 'Hai sognato di cadere nel vuoto',
+    preview: "Ti sei svegliato di scatto, cuore in gola. Quasi tutti lo sognano almeno una volta — sempre nello stesso momento: quando dentro qualcosa sta cedendo. Cosa stai perdendo davvero?",
+  },
 ];
 
 export default function Oniros() {
@@ -23,6 +41,7 @@ export default function Oniros() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [paid, setPaid] = useState(false);
   const [hasUsedFreeLens, setHasUsedFreeLens] = useState(false);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     if (localStorage.getItem('oniros_paid') === 'true') {
@@ -37,6 +56,13 @@ export default function Oniros() {
       setHasUsedFreeLens(true);
     }
   }, []);
+
+  const scrollToTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => textareaRef.current.focus(), 500);
+    }
+  };
 
   const handleCheckout = async () => {
     try {
@@ -91,11 +117,9 @@ export default function Oniros() {
     if (!paid) {
       setHasUsedFreeLens(true);
       localStorage.setItem('oniros_used_free', 'true');
-      // Solo Jung in anteprima
       await fetchLens('jung', dream);
       setInterpretation('done');
     } else {
-      // Tutte e 5 in parallelo
       await Promise.all(LENSES.map(l => fetchLens(l.id, dream)));
       setInterpretation('done');
     }
@@ -127,9 +151,9 @@ export default function Oniros() {
       const lines = part.split('\n');
       const heading = lines[0];
       const body = lines.slice(1).join('\n').trim()
-  .replace(/\*\*(.+?)\*\*/g, '$1')
-  .replace(/\*(.+?)\*/g, '$1')
-  .replace(/^---$/gm, '');
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/^---$/gm, '');
       return (
         <div key={i} className="mb-6">
           <h3 className="text-[12px] uppercase tracking-[0.2em] text-amber-200/70 mb-3 border-b border-amber-200/10 pb-2" style={{ fontFamily: 'Georgia, serif' }}>
@@ -158,8 +182,8 @@ export default function Oniros() {
         backgroundSize: '200px 200px',
       }} />
 
-      <div className="relative max-w-6xl mx-auto px-6 py-6 md:py-16">
-        <header className="mb-6 md:mb-14">
+      <div className="relative max-w-4xl mx-auto px-6 py-12 md:py-16">
+        <header className="mb-10 md:mb-14">
           <div className="flex items-baseline gap-4 mb-2">
             <span className="text-amber-200/70 text-2xl" style={{ fontFamily: 'Georgia, serif' }}>☾</span>
             <h1 className="text-amber-100 text-4xl md:text-5xl tracking-tight" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}>
@@ -172,14 +196,115 @@ export default function Oniros() {
         </header>
 
         {stage === 'input' && (
-          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
-            <div className="order-2 md:order-1">
-              <p className="text-stone-200/80 text-[17px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-                Quel sogno strano di stanotte non è casuale. La parte di te che l'ha creato — quella che lavora mentre dormi — sta cercando di dirti qualcosa che da sveglio fai fatica a vedere.
+          <>
+            {/* HOOK INIZIALE */}
+            <section className="mb-16">
+              <h2 className="text-amber-100 text-3xl md:text-4xl italic leading-tight mb-6" style={{ fontFamily: 'Georgia, serif' }}>
+                Quel sogno di stanotte non era casuale.
+              </h2>
+              <p className="text-stone-200/80 text-[18px] leading-relaxed mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                La parte di te che lavora mentre dormi — quella che da sveglio fai fatica ad ascoltare — sta cercando di dirti qualcosa.
               </p>
-              <p className="text-amber-200/70 text-[17px] leading-relaxed italic mb-12" style={{ fontFamily: 'Georgia, serif' }}>
-                Cinque scuole di psicologia, cinque risposte diverse alla stessa domanda: cosa significa davvero quello che hai sognato.
+              <p className="text-amber-200/70 text-[18px] leading-relaxed italic" style={{ fontFamily: 'Georgia, serif' }}>
+                Cinque scuole di psicologia, cinque risposte diverse. La verità del tuo sogno sta nel punto in cui si incontrano.
               </p>
+
+              <button
+                onClick={scrollToTextarea}
+                className="mt-8 rounded-md py-3 px-8 italic tracking-wide transition-all active:scale-[0.98]"
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  background: 'linear-gradient(135deg, #d4b483 0%, #b8935a 100%)',
+                  color: '#0a1020',
+                  fontSize: '1rem',
+                }}
+              >
+                Inizia ora — prima lettura gratuita →
+              </button>
+            </section>
+
+            {/* COSA SOGNANO GLI ALTRI */}
+            <section className="mb-16 pt-10 border-t border-amber-200/10">
+              <div className="mb-8">
+                <div className="text-stone-500 text-xs tracking-[0.3em] uppercase mb-3">— Cosa sognano gli altri</div>
+                <h2 className="text-amber-100 text-2xl md:text-3xl italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  Riconosci il tuo?
+                </h2>
+                <p className="text-stone-400 text-[15px] mt-2 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  Questi sono i sogni più ricorrenti. Se uno di loro ti suona familiare, c'è una ragione.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {COMMON_DREAMS.map((d, i) => (
+                  <div key={i} className="p-5 border border-amber-200/10 rounded-md bg-stone-950/30">
+                    <div className="flex items-baseline gap-3 mb-3">
+                      <span className="text-2xl">{d.icon}</span>
+                      <h3 className="text-amber-100 text-lg italic" style={{ fontFamily: 'Georgia, serif' }}>
+                        {d.title}
+                      </h3>
+                    </div>
+                    <p className="text-stone-300/80 text-[15px] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
+                      {d.preview}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={scrollToTextarea}
+                className="mt-8 italic text-amber-200/80 hover:text-amber-100 transition-colors text-sm"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                E il tuo sogno? Scoprilo ↓
+              </button>
+            </section>
+
+            {/* LE 5 VOCI */}
+            <section className="mb-16 pt-10 border-t border-amber-200/10">
+              <div className="mb-8">
+                <div className="text-stone-500 text-xs tracking-[0.3em] uppercase mb-3">— Le cinque voci</div>
+                <h2 className="text-amber-100 text-2xl md:text-3xl italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  Chi legge il tuo sogno
+                </h2>
+                <p className="text-stone-400 text-[15px] mt-2 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  Cinque scuole di psicologia, cinque domande diverse. Non risposte alternative — domande alternative.
+                </p>
+              </div>
+
+              <div className="space-y-5">
+                {LENSES.map((lens) => (
+                  <div key={lens.id} className="flex items-start gap-4 p-4">
+                    <div className="w-12 h-12 rounded-full border border-amber-200/30 flex items-center justify-center bg-stone-950 flex-shrink-0">
+                      <span className="text-amber-200/80 text-lg">{lens.glyph}</span>
+                    </div>
+                    <div>
+                      <div className="flex items-baseline gap-3 mb-1">
+                        <h3 className="text-amber-100 text-lg italic" style={{ fontFamily: 'Georgia, serif' }}>
+                          {lens.name}
+                        </h3>
+                        {lens.year && <span className="text-stone-600 text-xs">{lens.year}</span>}
+                      </div>
+                      <p className="text-stone-300/80 text-[15px] italic mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                        — {lens.question}
+                      </p>
+                      <p className="text-stone-500 text-[13px]" style={{ fontFamily: 'Georgia, serif' }}>
+                        {lens.tagline}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* COME FUNZIONA */}
+            <section className="mb-16 pt-10 border-t border-amber-200/10">
+              <div className="mb-8">
+                <div className="text-stone-500 text-xs tracking-[0.3em] uppercase mb-3">— Come funziona</div>
+                <h2 className="text-amber-100 text-2xl md:text-3xl italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  Tre passi, due minuti
+                </h2>
+              </div>
 
               <div className="space-y-6">
                 {[
@@ -206,29 +331,25 @@ export default function Oniros() {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="order-1 md:order-2">
+            {/* TEXTAREA + CTA */}
+            <section ref={textareaRef} className="pt-10 border-t border-amber-200/20 scroll-mt-8">
               <div className="mb-8">
-                <p className="text-stone-200/90 text-[19px] leading-relaxed mb-2 italic" style={{ fontFamily: 'Georgia, serif' }}>
-                  Quel sogno non era casuale.
-                </p>
-                <p className="text-amber-200/90 text-base italic" style={{ fontFamily: 'Georgia, serif' }}>
-                  ✦ La prima lettura è gratuita.
+                <div className="text-stone-500 text-xs tracking-[0.3em] uppercase mb-3">— Il tuo sogno</div>
+                <h2 className="text-amber-100 text-2xl md:text-3xl italic mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                  Cosa hai sognato?
+                </h2>
+                <p className="text-stone-400/70 text-[15px] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
+                  Raccontalo come lo ricordi — anche se è confuso. Più dettagli scrivi, più la lettura sarà precisa.
                 </p>
               </div>
-              <span className="block italic text-amber-200/80 text-lg mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-                Cosa hai sognato?
-              </span>
 
-              <span className="block text-stone-400/60 text-sm mb-4 leading-relaxed">
-                Anche confuso, anche a pezzi. Bastano immagini, luoghi, persone, sensazioni.
-              </span>
               <textarea
                 value={dream}
                 onChange={(e) => setDream(e.target.value)}
                 placeholder="Ero in una casa che conoscevo ma non era la mia..."
-                rows={8}
+                rows={10}
                 className="w-full bg-stone-950/40 border border-amber-200/20 rounded-md p-5 text-[17px] leading-relaxed text-stone-100 placeholder-stone-500/50 focus:outline-none focus:border-amber-200/50 transition-colors resize-none"
                 style={{ fontFamily: 'Georgia, serif' }}
               />
@@ -240,7 +361,7 @@ export default function Oniros() {
               <button
                 onClick={interpret}
                 disabled={loading}
-                className="w-full group rounded-md py-3 px-6 text-lg italic tracking-wide transition-all disabled:opacity-50 active:opacity-80 active:scale-[0.98]"
+                className="w-full group rounded-md py-4 px-8 text-lg italic tracking-wide transition-all disabled:opacity-50 active:opacity-80 active:scale-[0.98]"
                 style={{
                   fontFamily: 'Georgia, serif',
                   background: 'linear-gradient(135deg, #d4b483 0%, #c9a96e 50%, #b8935a 100%)',
@@ -249,7 +370,7 @@ export default function Oniros() {
                 }}
               >
                 <span className="flex items-center justify-center gap-3">
-                  <span>Scopri cosa significa - gratis</span>
+                  <span>Interpreta il sogno</span>
                   <span className="text-xl transition-transform group-hover:translate-x-1">→</span>
                 </span>
               </button>
@@ -275,8 +396,8 @@ export default function Oniros() {
                   </button>
                 </div>
               )}
-            </div>
-          </div>
+            </section>
+          </>
         )}
 
         {stage === 'result' && (
@@ -288,29 +409,27 @@ export default function Oniros() {
               </div>
             </div>
 
-            {/* Loading status */}
             {loading && (
-  <div className="py-12 text-center">
-    <div className="inline-block text-amber-200/60 text-4xl animate-pulse">☾</div>
-    <div className="mt-4 italic text-stone-400" style={{ fontFamily: 'Georgia, serif' }}>
-      {paid ? 'Le cinque voci stanno leggendo il tuo sogno…' : 'Lettura in corso…'}
-    </div>
-    {paid && (
-      <div className="mt-6 inline-flex flex-col gap-2 text-left">
-        {LENSES.map(lens => (
-          <div key={lens.id} className="flex items-center gap-3">
-            <span className={`text-base w-5 ${lensStatus[lens.id] === 'done' ? 'text-amber-200' : lensStatus[lens.id] === 'loading' ? 'text-amber-200/40' : 'text-stone-700'}`}>{lens.glyph}</span>
-            <span className={`text-sm italic ${lensStatus[lens.id] === 'done' ? 'text-stone-400' : 'text-stone-600'}`} style={{ fontFamily: 'Georgia, serif' }}>
-              {lens.name} {lensStatus[lens.id] === 'done' ? '— completata' : lensStatus[lens.id] === 'loading' ? '— in lettura…' : ''}
-            </span>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
+              <div className="py-12 text-center">
+                <div className="inline-block text-amber-200/60 text-4xl animate-pulse">☾</div>
+                <div className="mt-4 italic text-stone-400" style={{ fontFamily: 'Georgia, serif' }}>
+                  {paid ? 'Le cinque voci stanno leggendo il tuo sogno…' : 'Lettura in corso…'}
+                </div>
+                {paid && (
+                  <div className="mt-6 inline-flex flex-col gap-2 text-left">
+                    {LENSES.map(lens => (
+                      <div key={lens.id} className="flex items-center gap-3">
+                        <span className={`text-base w-5 ${lensStatus[lens.id] === 'done' ? 'text-amber-200' : lensStatus[lens.id] === 'loading' ? 'text-amber-200/40' : 'text-stone-700'}`}>{lens.glyph}</span>
+                        <span className={`text-sm italic ${lensStatus[lens.id] === 'done' ? 'text-stone-400' : 'text-stone-600'}`} style={{ fontFamily: 'Georgia, serif' }}>
+                          {lens.name} {lensStatus[lens.id] === 'done' ? '— completata' : lensStatus[lens.id] === 'loading' ? '— in lettura…' : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
-            {/* Interpretazioni */}
             {lensesToShow.map((lens, i) => {
               const text = allInterpretations[lens.id];
               const status = lensStatus[lens.id];
@@ -335,7 +454,6 @@ export default function Oniros() {
               );
             })}
 
-            {/* Paywall dopo Jung */}
             {!paid && hasUsedFreeLens && allInterpretations['jung'] && (
               <div className="mt-2 p-6 border border-amber-200/20 bg-amber-200/5 rounded-md">
                 <p className="text-amber-100 italic text-lg mb-1" style={{ fontFamily: 'Georgia, serif' }}>
